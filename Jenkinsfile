@@ -6,25 +6,45 @@ pipeline {
 
     stage('Build') {
       steps {
-        sh 'echo "Hello World"'
+        sh 'echo "Jenkins Pipeline on AWS Project"'
+        sh 'echo "Author: Precious Adeyinka"'
         sh '''
-         echo "Multiline shell steps works too"
+         echo "Get Directory Listing..."
          ls -lah
         '''
       }
     }
 
-    // stage('Lint HTML') {
+    // stage('Build') {
     //   steps {
-    //     sh 'tidy -q -e *.html'
+    //     sh 'echo "Hello World"'
+    //     sh '''
+    //      echo "Multiline shell steps works too"
+    //      ls -lah
+    //     '''
     //   }
     // }
+
+    stage('Lint HTML') {
+      steps {
+        sh 'tidy -q -e *.html'
+      }
+    }
 
     // stage('Security Scan') {
     //   steps { 
     //     aquaMicroscanner imageName: 'alpine:latest', notCompliesCmd: 'exit 1', onDisallowed: 'fail', outputFormat: 'html'
     //   }
     // } 
+
+    stage('Upload to AWS') {
+      steps {
+        withAWS(region:'us-west-2', credentials:'aws-static') {
+        sh 'echo "Uploading content with AWS creds"'
+          s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'index.html', bucket:'pflash-jenkins-static-bucket')
+        }
+      }
+    } 
 
     // stage('Upload to AWS') {
     //   steps {
